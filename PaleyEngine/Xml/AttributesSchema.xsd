@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema id="AttributesSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<!-- Non empty string -->
+	<xs:simpleType name="nonEmptyString">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Types -->
+	<xs:simpleType name="enumTypes">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="A" />
+			<xs:enumeration value="N" />
+			<xs:enumeration value="D" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Main -->
+	<xs:element name="Attributes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Attribute" minOccurs="1" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="id" type="xs:nonNegativeInteger" use="required" />
+						<xs:attribute name="name" type="nonEmptyString" use="required" />
+						<xs:attribute name="group" type="xs:string" use="optional" />
+						<xs:attribute name="type" type="enumTypes" use="required" />
+						<xs:attribute name="system" type="xs:boolean" use="required" />
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PaleyEngine/PaleyEngine.csproj" />
+  <Project Path="PaleyEngineRepl/PaleyEngineRepl.csproj" />
+</Solution>

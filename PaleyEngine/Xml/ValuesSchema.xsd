@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ValuesSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<!-- Non Empty String-->
+	<xs:simpleType name="nonEmptyString">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Main -->
+	<xs:element name="Values">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Value" minOccurs="1" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="id" type="xs:nonNegativeInteger" use="required" />
+						<xs:attribute name="value" type="nonEmptyString" use="required" />
+						<xs:attribute name="description" type="nonEmptyString" use="required" />
+						<xs:attribute name="tally" type="xs:positiveInteger" use="required" />
+						<xs:attribute name="start" type="xs:positiveInteger" use="required" />
+						<xs:attribute name="number" type="xs:positiveInteger" use="required" />
+						<xs:attribute name="offset" type="xs:nonNegativeInteger" use="required" />
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
