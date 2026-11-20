@@ -18,8 +18,9 @@ internal class Counter
     }
 
     internal long UniverseTally { get; set; }
+    internal long SelectionTally { get; set; }
 
-    internal void Count(XDocument document)
+    internal long Count(XDocument document)
     {
         if (_database is null)
         {
@@ -37,9 +38,9 @@ internal class Counter
         var selectionRoot = document.Root?.Element("selection");
         var splitsRoot = document.Root?.Element("splits");
 
-         var selectionTally = CountSelection(selectionRoot);
+        SelectionTally = CountSelection(selectionRoot);
 
-        Console.WriteLine($"Counting completed successfully. Selection tally: {selectionTally:N0}");
+        return SelectionTally;
     }
 
     private long CountSelection(XElement selectionRoot)

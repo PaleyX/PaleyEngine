@@ -19,7 +19,7 @@ namespace PaleyEngine
             _database = new PaleyDatabase(path);
         }
 
-        public void Count(XDocument document)
+        public long Count(XDocument document)
         {
             if (_database is null)
             {
@@ -27,7 +27,8 @@ namespace PaleyEngine
             }
 
             var counter = new Counter(_database);
-            counter.Count(document);
+            
+            return counter.Count(document);
         }
     }
 }
