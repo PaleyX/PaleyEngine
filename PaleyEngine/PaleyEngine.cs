@@ -1,4 +1,5 @@
 ﻿using PaleyEngine.Database;
+using System.Xml.Linq;
 
 namespace PaleyEngine
 {
@@ -16,6 +17,17 @@ namespace PaleyEngine
             }
 
             _database = new PaleyDatabase(path);
+        }
+
+        public void Count(XDocument document)
+        {
+            if (_database is null)
+            {
+                throw new PaleyEngineException("Database is not opened. Please call OpenDatabase() first.");
+            }
+
+            var counter = new Counter(_database);
+            counter.Count(document);
         }
     }
 }

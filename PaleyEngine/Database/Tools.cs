@@ -30,5 +30,31 @@ internal static class Tools
     {
         throw new PaleyEngineException("Schema validation error: " + e.Message);
     }
+
+    internal static T GetInfo<T>(XDocument document, string name)
+    {
+        try
+        {
+            return (T)Convert.ChangeType(document.Descendants(name).First().Value, typeof(T));
+        }
+        catch
+        {
+            throw new PaleyEngineException("Cannot find element: " + name);
+        }
+    }
+
+    internal static string GetPath(string directory, string filename)
+    {
+        ArgumentNullException.ThrowIfNullOrEmpty(directory);
+        ArgumentNullException.ThrowIfNullOrEmpty(filename);
+
+        var path = Path.Combine(directory, filename);
+        if (!File.Exists(path))
+        {
+            throw new FileNotFoundException($"File not found: {path}");
+        }
+
+        return path;
+    }
 }
 

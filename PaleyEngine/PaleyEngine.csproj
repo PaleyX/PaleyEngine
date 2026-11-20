@@ -7,11 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Xml\CountSchema.xsd" />
+    <None Remove="Xml\InfoSchema.xsd" />
     <None Remove="Xml\ValuesSchema.xsd" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Xml\AttributesSchema.xsd" />
+    <EmbeddedResource Include="Xml\CountSchema.xsd" />
+    <EmbeddedResource Include="Xml\InfoSchema.xsd" />
     <EmbeddedResource Include="Xml\ValuesSchema.xsd" />
   </ItemGroup>
 

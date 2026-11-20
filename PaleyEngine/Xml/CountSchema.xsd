@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="CountSchema"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<!-- Non empty string -->
+	<xs:simpleType name="nonEmptyString">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Logic types -->
+	<xs:simpleType name="enumLogicTypes">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="OR" />
+			<xs:enumeration value="AND" />
+			<xs:enumeration value="NOT" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Split types -->
+	<xs:simpleType name="enumSplitTypes">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="value" />
+			<xs:enumeration value="entity" />
+			<xs:enumeration value="library" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- Split Attribute -->
+	<xs:complexType name="splitAttribute">
+		<xs:sequence minOccurs="1" maxOccurs="unbounded">
+			<xs:element name="value" type="nonEmptyString" />
+		</xs:sequence>
+		<xs:attribute name="id" type="nonEmptyString" use="required" />
+		<xs:attribute name="op" type="nonEmptyString" use="required" />
+		<xs:attribute name="lev" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<!-- Split Entity Library -->
+	<xs:complexType name="splitEntity">
+		<xs:simpleContent>
+			<xs:extension base="nonEmptyString">
+				<xs:attribute name="id" type="nonEmptyString" use="required" />
+				<xs:attribute name="lev" type="xs:string" use="required" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<!-- Split Library -->
+	<xs:complexType name="splitLibrary">
+		<xs:simpleContent>
+			<xs:extension base="nonEmptyString">
+				<xs:attribute name="id" type="nonEmptyString" use="required" />
+				<xs:attribute name="lev" type="xs:string" use="required" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<!-- 
+  Entity type - so we can have attributes and a type 
+  http://stackoverflow.com/questions/4250541/xsd-schema-for-this-fragment
+  -->
+	<xs:complexType name="entityType">
+		<xs:simpleContent>
+			<xs:extension base="nonEmptyString">
+				<xs:attribute name="id" type="nonEmptyString" use="required" />
+				<xs:attribute name="lev" type="xs:string" use="required" />
+				<xs:attribute name="t" type="xs:double" use="required" />
+				<xs:attribute name="l" type="xs:double" use="required" />
+				<xs:attribute name="color" type="xs:string" />
+				<xs:attribute name="disabled" type="xs:boolean" use="optional" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<!-- Library type - see Entity type-->
+	<xs:complexType name="libraryType">
+		<xs:simpleContent>
+			<xs:extension base="nonEmptyString">
+				<xs:attribute name="id" type="nonEmptyString" use="required" />
+				<xs:attribute name="lev" type="xs:string" use="required" />
+				<xs:attribute name="t" type="xs:double" use="required" />
+				<xs:attribute name="l" type="xs:double" use="required" />
+				<xs:attribute name="color" type="xs:string" />
+				<xs:attribute name="disabled" type="xs:boolean" use="optional" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<!-- Logic -->
+	<xs:group name="logicBlock">
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<!-- Attribute -->
+				<xs:element name="attr">
+					<xs:complexType>
+						<xs:sequence minOccurs="1" maxOccurs="unbounded">
+							<xs:element name="value" type="nonEmptyString" />
+						</xs:sequence>
+						<xs:attribute name="id" type="nonEmptyString" use="required" />
+						<xs:attribute name="op" type="nonEmptyString" use="required" />
+						<xs:attribute name="lev" type="xs:string" use="required" />
+						<xs:attribute name="t" type="xs:double" use="required" />
+						<xs:attribute name="l" type="xs:double" use="required" />
+						<xs:attribute name="color" type="xs:string" />
+						<xs:attribute name="disabled" type="xs:boolean" use="optional" />
+					</xs:complexType>
+				</xs:element>
+				<!-- Entity -->
+				<xs:element name="entity" type="entityType" />
+				<!-- Library -->
+				<xs:element name="library" type="libraryType" />
+				<!-- Logic -->
+				<xs:element name="logic">
+					<xs:complexType>
+						<xs:group ref="logicBlock" />
+						<xs:attribute name="type" type="enumLogicTypes" use="required" />
+						<xs:attribute name="l" type="xs:double" use="required" />
+						<xs:attribute name="t" type="xs:double" use="required" />
+						<xs:attribute name="w" type="xs:double" use="required" />
+						<xs:attribute name="h" type="xs:double" use="required" />
+						<xs:attribute name="color" type="nonEmptyString" use="required" />
+						<xs:attribute name="disabled" type="xs:boolean" use="optional" />
+						<xs:attribute name="usertitle" type="xs:string" use="optional" />
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:group>
+
+	<!-- Main -->
+	<xs:element name="Count">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="generator" type="nonEmptyString" minOccurs="1" maxOccurs="1" />
+				<xs:element name="database" type="nonEmptyString" minOccurs="1" maxOccurs="1" />
+				<!-- Selection -->
+				<xs:element name="selection" minOccurs="1" maxOccurs="1">
+					<xs:complexType>
+						<xs:group ref="logicBlock" />
+					</xs:complexType>
+				</xs:element>
+				<!-- 
+          Splits - we can't limit sub type on the split type 
+        -->
+				<xs:element name="splits" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence minOccurs="1" maxOccurs="unbounded">
+							<xs:element name="split">
+								<xs:complexType>
+									<xs:choice minOccurs="1" maxOccurs="1">
+										<xs:element name="attr" type="splitAttribute" />
+										<xs:element name="entity" type="splitEntity" />
+										<xs:element name="library" type="splitLibrary" />
+									</xs:choice>
+									<xs:attribute name="type" type="enumSplitTypes" use="required" />
+									<xs:attribute name="qty" type="nonEmptyString" use="required" />
+									<xs:attribute name="key" type="xs:string" use="required" />
+									<xs:attribute name="key2" type="xs:string" use="optional" />
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="lev" type="nonEmptyString" use="required" />
+			<xs:attribute name="ver" type="xs:string" use="required" />
+			<xs:attribute name="date" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>
