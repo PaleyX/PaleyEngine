@@ -132,4 +132,42 @@ internal class BitVector
                 }
         }
     }
+
+    internal void AndVector(BitVector vector)
+    {
+        Debug.Assert(vector != null);
+        Debug.Assert(vector != this);
+        Debug.Assert(_fileLength == vector.Length);
+
+        BitVectorOperations.And(_vector, vector._vector);
+    }
+
+    internal void OrVector(BitVector vector)
+    {
+        Debug.Assert(vector != null);
+        Debug.Assert(vector != this);
+        Debug.Assert(_fileLength == vector.Length);
+
+        BitVectorOperations.Or(_vector, vector._vector);
+    }
+
+    internal void NotVector(BitVector vector)
+    {
+        Debug.Assert(vector != null);
+        Debug.Assert(vector != this);
+        Debug.Assert(_fileLength == vector.Length);
+
+        BitVectorOperations.Not(_vector, vector._vector);
+    }
+
+    internal int Length
+    {
+        get
+        {
+            Debug.Assert(_vector.Length == _fileLength);
+            return _fileLength;
+        }
+    }
+
+
 }
