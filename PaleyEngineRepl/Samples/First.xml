@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Count lev="x" ver="y" date="x">
+	<generator>PaleyEngineRepl</generator>
+	<database>gort</database>
+	<selection>
+		<attr id="Postcode area" op="=" lev="gort" t="0" l="0">
+			<value>LS</value> <!-- Leeds 720540 -->
+			<value>BS</value> <!-- Bristol 762331 -->
+		</attr>
+	</selection>
+</Count>
