@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-//TODO: remove this and use ArrayPool
-
 namespace PaleyEngine.Translations;
 
 /// <summary>
