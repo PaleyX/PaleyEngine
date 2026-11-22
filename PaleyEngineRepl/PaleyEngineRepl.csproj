@@ -8,11 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Samples\DbAsiaMeat.xml" />
+    <None Remove="Samples\DbAsiaNorthAmerica.xml" />
     <None Remove="Samples\First.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Samples\DbAsiaMeat.xml" />
+    <EmbeddedResource Include="Samples\DbAsiaNorthAmerica.xml" />
     <EmbeddedResource Include="Samples\First.xml" />
+    <EmbeddedResource Include="Samples\DbAsia.xml" />
   </ItemGroup>
 
   <ItemGroup>

@@ -45,6 +45,7 @@ internal class BitVector
         using var stream = new FileStream(_dataPath, FileMode.Open, FileAccess.Read, FileShare.Read);
         using var reader = new BinaryReader(stream);
 
+        //TODO: the -1 works for the trading floor data but not the test data - 21.11.26
         reader.BaseStream.Seek(offset - 1, SeekOrigin.Begin);
 
         for (int i = 0; i < number; ++i)
@@ -169,5 +170,18 @@ internal class BitVector
         }
     }
 
+    internal void DumpVector(string pathname)
+    {
+        Debug.Assert(_vector != null);
 
+        using (var stream = new FileStream(pathname, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            using (var writer = new BinaryWriter(stream))
+            {
+                Debug.Assert(_vector.Length == _fileLength);
+                writer.Write(_vector);
+                writer.Flush();
+            }
+        }
+    }
 }

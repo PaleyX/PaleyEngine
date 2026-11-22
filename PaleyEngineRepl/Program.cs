@@ -38,7 +38,9 @@ static void RunCount(string command)
      var document = XDocument.Load(stream);
 
     var paleyEngine = new PaleyEngine.PaleyEngine();
-    paleyEngine.OpenDatabase(@"C:\Users\jonat\source\repos\FreshCount - Original\DB\info.lki");
+    //paleyEngine.OpenDatabase(@"C:\Users\jonat\source\repos\FreshCount - Original\DB\info.lki");
+    paleyEngine.OpenDatabase(@"C:\Databases\Test\lk\info.lki");
 
-    paleyEngine.Count(document);
+    var count = paleyEngine.Count(document);
+    Console.WriteLine($"Count: {count:N0}");
 }

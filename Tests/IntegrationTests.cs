@@ -27,16 +27,15 @@ public class IntegrationTests : IClassFixture<DatabaseFixture>
                   	<generator>PaleyEngineRepl</generator>
                   	<database>gort</database>
                   	<selection>
-                  		<attr id="Postcode area" op="=" lev="gort" t="0" l="0">
-                  			<value>LS</value> <!-- Leeds 720540 -->
-                  			<value>BS</value> <!-- Bristol 762331 -->
+                  		<attr id="Region" op="=" lev="gort" t="0" l="0">
+                  			<value>Asia</value> <!-- 1469 -->
+                  			<value>North America</value> <!-- 215 -->
                   		</attr>
                   	</selection>
                   </Count>
                   """;
 
-
-        Assert.Equal(720540 + 762331, GetCount(xml));
+        Assert.Equal(1469 + 215, GetCount(xml));
     }
 
     private static long GetCount(string xml)
