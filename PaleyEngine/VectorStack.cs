@@ -1,9 +1,5 @@
 ﻿using PaleyEngine.Database;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 namespace PaleyEngine;
 
@@ -31,7 +27,7 @@ internal class VectorStack
                 _database.BitmapLength
             );
 
-        if(logicType == LogicType.And || logicType == LogicType.Not)
+        if(logicType is LogicType.And or LogicType.Not)
         {
             var value = _database.GetUniverse();
             vector.GetData(value);

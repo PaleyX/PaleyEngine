@@ -40,7 +40,7 @@ internal class Counter
         return SelectionTally;
     }
 
-    private long CountSelection(XElement selectionRoot)
+    private long CountSelection(XContainer selectionRoot)
     {
         var vectorStack = new VectorStack(_database);
 
@@ -139,121 +139,115 @@ internal class Counter
 
         //TODO - write to CSV 
 
-        using (var writer = new StreamWriter(path))
-        {
-            var vector = vectorStack.GetTopVector();
+        using var writer = new StreamWriter(path);
+        var vector = vectorStack.GetTopVector();
 
-            using (TemporaryFile tempSource = new(),
-                                 tempObject = new())
-            {
-                vector.DumpVector(tempSource.Pathname);
+        using TemporaryFile tempSource = new(),
+                            tempObject = new();
 
-                // Translate Temp 2 Perm
-                long length = new FileInfo(_database.PermTemp).Length;
+        vector.DumpVector(tempSource.Pathname);
 
-                //using (var translator = new UrnTranslator())
-                //{
-                //    translator.BinaryTempToPerm(tempSource.Pathname, tempObject.Pathname, _database.TempPerm, length);
-                //}
-                UrnTranslator.BinaryTempToPerm(tempSource.Pathname, tempObject.Pathname, _database.TempPerm, length);
-                //LegacyUrnTranslator.BinaryTempToPerm(tempSource.Pathname, tempObject.Pathname, _database.TempPerm, length);
+        // Translate Temp 2 Perm
+        var length = new FileInfo(_database.PermTemp).Length;
+
+        //using (var translator = new UrnTranslator())
+        //{
+        //    translator.BinaryTempToPerm(tempSource.Pathname, tempObject.Pathname, _database.TempPerm, length);
+        //}
+        UrnTranslator.BinaryTempToPerm(tempSource.Pathname, tempObject.Pathname, _database.TempPerm, length);
+        //LegacyUrnTranslator.BinaryTempToPerm(tempSource.Pathname, tempObject.Pathname, _database.TempPerm, length);
 
 
-                var exported = CreateUrnsFromBitFile(writer, tempObject.Pathname, keycode, keycode2, vector.Tally());
-            }
-        }
+        var exported = CreateUrnsFromBitFile(writer, tempObject.Pathname, keycode, keycode2, vector.Tally());
     }
 
-    private int CreateUrnsFromBitFile(StreamWriter writer, string dumpedPath, string keycode1, string keycode2, long expected)
+    private static int CreateUrnsFromBitFile(TextWriter writer, string dumpedPath, string keycode1, string keycode2, long expected)
     {
         //Debug.Assert(HasCount());
-        int currentTally = 0;
+        var currentTally = 0;
 
-        using (var stream = new FileStream(dumpedPath, FileMode.Open, FileAccess.Read, FileShare.None))
+        using var stream = new FileStream(dumpedPath, FileMode.Open, FileAccess.Read, FileShare.None);
+        using var reader = new BinaryReader(stream);
+
+        var hasKeycode1 = !string.IsNullOrWhiteSpace(keycode1);
+        var hasKeycode2 = !string.IsNullOrWhiteSpace(keycode2);
+
+        //OnUrnExportProgress.Raise(this, new ProgressEventArgs(0, 100));
+
+        int urn = 0;
+        //int oldPercent = 0;
+
+        const int TOREAD = 2048;
+
+        for (; ; )
         {
-            using (var reader = new BinaryReader(stream))
+            byte[] buffer = reader.ReadBytes(TOREAD);
+
+            for (int i = 0; i < buffer.Length; i++)
             {
-                bool hasKeycode1 = !string.IsNullOrWhiteSpace(keycode1);
-                bool hasKeycode2 = !string.IsNullOrWhiteSpace(keycode2);
+                byte b = buffer[i];
+                int temp = 0;
 
-                //OnUrnExportProgress.Raise(this, new ProgressEventArgs(0, 100));
-
-                int urn = 0;
-                int oldPercent = 0;
-
-                const int TOREAD = 2048;
-
-                for (; ; )
+                while (b > 0)
                 {
-                    byte[] buffer = reader.ReadBytes(TOREAD);
-
-                    for (int i = 0; i < buffer.Length; i++)
+                    if ((b & 1) > 0)
                     {
-                        byte b = buffer[i];
-                        int temp = 0;
+                        long write = urn + temp;
 
-                        while (b > 0)
+                        writer.Write(write.ToString());
+
+                        if (hasKeycode1)
                         {
-                            if ((b & 1) > 0)
+                            writer.Write(keycode1);
+
+                            if (hasKeycode2)
                             {
-                                long write = urn + temp;
-
-                                writer.Write(write.ToString());
-
-                                if (hasKeycode1)
-                                {
-                                    writer.Write(keycode1);
-
-                                    if (hasKeycode2)
-                                    {
-                                        writer.Write(keycode2);
-                                    }
-                                }
-
-                                writer.WriteLine();
-                                ++currentTally;
+                                writer.Write(keycode2);
                             }
-
-                            b >>= 1;
-                            ++temp;
                         }
 
-                        urn += 8;
+                        writer.WriteLine();
+                        ++currentTally;
                     }
 
-                    // progress
-                    //if (currentTally > 0)
-                    //{
-                    //    int percent = (int)(((double)currentTally / (double)expected) * 100d);
-                    //    if (percent != oldPercent)
-                    //    {
-                    //        OnUrnExportProgress.Raise(this, new ProgressEventArgs(percent, 100));
-                    //        oldPercent = percent;
-                    //    }
-                    //}
-
-                    if (buffer.Length < TOREAD)
-                        break;
+                    b >>= 1;
+                    ++temp;
                 }
 
-                if (currentTally != expected)
-                {
-                    throw new PaleyEngineException($"WARNING - Export didn't export all URNs. Exported {currentTally:N0} from {expected:N0}");
-                    //OnStatusText.Raise(this, new TextInfoEventArgs(string.Format("WARNING - Export didn't export all URNs. Exported {0:N0} from {1:N0}", currentTally, expected)));
-                }
-
-                //OnUrnExportProgress.Raise(this, new ProgressEventArgs(100, 100));
+                urn += 8;
             }
+
+            // progress
+            //if (currentTally > 0)
+            //{
+            //    int percent = (int)(((double)currentTally / (double)expected) * 100d);
+            //    if (percent != oldPercent)
+            //    {
+            //        OnUrnExportProgress.Raise(this, new ProgressEventArgs(percent, 100));
+            //        oldPercent = percent;
+            //    }
+            //}
+
+            if (buffer.Length < TOREAD)
+                break;
         }
+
+        if (currentTally != expected)
+        {
+            throw new PaleyEngineException($"WARNING - Export didn't export all URNs. Exported {currentTally:N0} from {expected:N0}");
+            //OnStatusText.Raise(this, new TextInfoEventArgs(string.Format("WARNING - Export didn't export all URNs. Exported {0:N0} from {1:N0}", currentTally, expected)));
+        }
+
+        //OnUrnExportProgress.Raise(this, new ProgressEventArgs(100, 100));
 
         return currentTally;
     }
 
-    /// <summary>
-    /// Is there a current count active
-    /// </summary>
-    /// <returns>true if a count is currently active</returns>
-    //public bool HasCount()
+    ///// <summary>
+    ///// Is there a current count active
+    ///// </summary>
+    ///// <returns>true if a count is currently active</returns>
+    ////public bool HasCount()
     //{
     //    if (_VectorStack == null || _VectorStack.Size < 1)
     //        return false;

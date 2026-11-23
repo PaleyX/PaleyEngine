@@ -1,9 +1,6 @@
 ﻿using PaleyEngine;
-using System.Diagnostics;
 using System.Reflection;
 using System.Xml.Linq;
-
-int i = 0;
 
 while (true)
 {
@@ -28,14 +25,15 @@ while (true)
 
 static void RunCount(string command)
 {
-    Assembly a = Assembly.GetExecutingAssembly();
+    var a = Assembly.GetExecutingAssembly();
 
-    using Stream? stream = a.GetManifestResourceStream($"PaleyEngineRepl.Samples.{command}.xml");
+    using var stream = a.GetManifestResourceStream($"PaleyEngineRepl.Samples.{command}.xml");
     if (stream is null)
     {
         throw new PaleyEngineException($"Cannot find schema resource: {command}");
     }
-     var document = XDocument.Load(stream);
+
+    var document = XDocument.Load(stream);
 
     var paleyEngine = new PaleyEngine.PaleyEngine();
     //paleyEngine.OpenDatabase(@"C:\Users\jonat\source\repos\FreshCount - Original\DB\info.lki");

@@ -1,7 +1,4 @@
-﻿using PaleyEngine.Database;
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace PaleyEngine.Translations;
 

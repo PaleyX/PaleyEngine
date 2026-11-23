@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace Tests.UrnTranslatorTests;
+﻿namespace Tests.UrnTranslatorTests;
 
 internal sealed class TranslationParityTestsFixture : IDisposable
 {

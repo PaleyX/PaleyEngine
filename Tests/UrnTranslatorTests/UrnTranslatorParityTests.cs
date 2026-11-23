@@ -1,6 +1,5 @@
 ﻿using PaleyEngine.Translations;
-using System.Diagnostics;
-using Xunit;
+using Tests.LegacyCode;
 
 namespace Tests.UrnTranslatorTests;
 
@@ -8,9 +7,9 @@ public class UrnTranslatorParityTests
 {
     public static IEnumerable<object[]> Seeds()
     {
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
-            yield return new object[] { i };
+            yield return [i];
         }
     }
 
@@ -46,13 +45,13 @@ public class UrnTranslatorParityTests
         using var fixture =
             TranslationParityTestsFixture.CreateEmpty();
 
-        byte[] expected =
+        var expected =
             LegacyUrnTranslator.BinaryPermToTemp(
                 fixture.SourceFile,
                 fixture.TranslationFile,
                 fixture.Length);
 
-        byte[] actual =
+        var actual =
             UrnTranslator.BinaryPermToTemp(
                 fixture.SourceFile,
                 fixture.TranslationFile,

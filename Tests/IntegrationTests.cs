@@ -1,22 +1,14 @@
-﻿using System.Reflection;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using Xunit.Sdk;
 
 namespace Tests;
 
-public class IntegrationTests : IClassFixture<DatabaseFixture>
+public class IntegrationTests(DatabaseFixture fixture) : IClassFixture<DatabaseFixture>
 {
-    private readonly DatabaseFixture _fixture;
-
-    public IntegrationTests(DatabaseFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
     [Fact]
     public void SimpleAttributesQueryWorks()
     {
-        if (!_fixture.DatabaseExists)
+        if (!fixture.DatabaseExists)
         {
             throw SkipException.ForSkip("Required file missing.");
         }

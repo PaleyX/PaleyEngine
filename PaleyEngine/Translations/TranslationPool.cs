@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace PaleyEngine.Translations;
+﻿namespace PaleyEngine.Translations;
 
 /// <summary>
 /// The buffer pool for the large arrays used to return the translated URNs
@@ -12,11 +8,11 @@ namespace PaleyEngine.Translations;
 /// </summary>
 internal sealed class TranslationPool
 {
-    private readonly List<byte[]> _Buffers;
+    private readonly List<byte[]> _buffers;
 
     private TranslationPool()
     {
-        _Buffers = new List<byte[]>();
+        _buffers = [];
     }
 
     // Singleton - the only way to access the pool
@@ -25,7 +21,7 @@ internal sealed class TranslationPool
     {
         get
         {
-            return _Instance ?? (_Instance = new TranslationPool());
+            return _Instance ??= new TranslationPool();
         }
     }
 
@@ -37,12 +33,12 @@ internal sealed class TranslationPool
     /// <returns>a byte array</returns>
     internal byte[] CheckOut(long size)
     {
-        for (int i = 0; i < _Buffers.Count; ++i)
+        for (int i = 0; i < _buffers.Count; ++i)
         {
-            if (_Buffers[i].Length == size)
+            if (_buffers[i].Length == size)
             {
-                var buffer = _Buffers[i];
-                _Buffers.RemoveAt(i);
+                var buffer = _buffers[i];
+                _buffers.RemoveAt(i);
 
                 return buffer;
             }
@@ -57,14 +53,14 @@ internal sealed class TranslationPool
     /// <param name="buffer">the byte array to return</param>
     internal void CheckIn(byte[] buffer)
     {
-        if (_Buffers.Any(item => item.Length == buffer.Length))
+        if (_buffers.Any(item => item.Length == buffer.Length))
         {
             return;
         }
 
         Array.Clear(buffer, 0, buffer.Length);
 
-        _Buffers.Add(buffer);
+        _buffers.Add(buffer);
     }
 
     /// <summary>
@@ -72,6 +68,6 @@ internal sealed class TranslationPool
     /// </summary>
     internal void Clear()
     {
-        _Buffers.Clear();
+        _buffers.Clear();
     }
 }

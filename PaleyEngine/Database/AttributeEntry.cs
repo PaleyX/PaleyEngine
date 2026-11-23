@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace PaleyEngine.Database;
 
@@ -30,9 +27,7 @@ internal class AttributeEntry
 
     internal ValueEntry GetValue(string value)
     {
-        ValueEntry result;
-
-        if (_Values.TryGetValue(value, out result))
+        if (_Values.TryGetValue(value, out ValueEntry? result))
             return result;
 
         throw new PaleyEngineException("Cannot find value: " + value);

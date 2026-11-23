@@ -1,12 +1,6 @@
 ﻿using PaleyEngine;
-using PaleyEngine.Database;
 using PaleyEngine.Translations;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Numerics;
-using Xunit;
 
 namespace Tests.UrnTranslatorTests;
 
@@ -16,7 +10,7 @@ public sealed class UrnTranslatorTests
     public void SingleBitTranslatesCorrectly()
     {
         using TranslationFixture fixture = new(
-            new byte[] { 0b00000001 },
+            [0b00000001],
             25, 1, 2, 3, 4, 5, 6, 7);
 
         byte[] result =
@@ -40,7 +34,7 @@ public sealed class UrnTranslatorTests
     public void MultipleBitsTranslateCorrectly()
     {
         using TranslationFixture fixture = new(
-            new byte[] { 0b00000111 },
+            [0b00000111],
             10, 20, 30, 3, 4, 5, 6, 7);
 
         byte[] result =
@@ -67,10 +61,10 @@ public sealed class UrnTranslatorTests
     public void EmptySourceProducesEmptyBitmap()
     {
         using TranslationFixture fixture = new(
-            new byte[] { 0, 0, 0, 0 },
+            [0, 0, 0, 0],
             Enumerable.Range(0, 32).ToArray());
 
-        byte[] result =
+        var result =
             UrnTranslator.BinaryPermToTemp(
                 fixture.SourceFile,
                 fixture.TranslationFile,
@@ -90,7 +84,7 @@ public sealed class UrnTranslatorTests
     public void FirstUrnCanBeSet()
     {
         using TranslationFixture fixture = new(
-            new byte[] { 1 },
+            [1],
             0, 1, 2, 3, 4, 5, 6, 7);
 
         byte[] result =
@@ -115,7 +109,7 @@ public sealed class UrnTranslatorTests
         const int highestUrn = 10000;
 
         using TranslationFixture fixture = new(
-            new byte[] { 1 },
+            [1],
             highestUrn, 1, 2, 3, 4, 5, 6, 7);
 
         byte[] result =
@@ -157,7 +151,7 @@ public sealed class UrnTranslatorTests
                 0,
                 translationCount).ToArray());
 
-        byte[] result =
+        var result =
             UrnTranslator.BinaryPermToTemp(
                 fixture.SourceFile,
                 fixture.TranslationFile,
@@ -211,7 +205,7 @@ public sealed class UrnTranslatorTests
     public void NegativeTranslationThrows()
     {
         using TranslationFixture fixture = new(
-            new byte[] { 1 },
+            [1],
             -1, 1, 2, 3, 4, 5, 6, 7);
 
         Assert.Throws<PaleyEngineException>(
@@ -337,19 +331,9 @@ public sealed class UrnTranslatorTests
              (1 << bitOffset)) != 0;
     }
 
-    private static int CountBits(
-        byte[] buffer)
+    private static int CountBits(IEnumerable<byte> buffer)
     {
-        int count = 0;
-
-        foreach (byte value in buffer)
-        {
-            count +=
-                BitOperations.PopCount(
-                    value);
-        }
-
-        return count;
+        return buffer.Sum(value => BitOperations.PopCount(value));
     }
 
     private sealed class TranslationFixture : IDisposable

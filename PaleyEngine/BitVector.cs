@@ -1,8 +1,5 @@
 ﻿using PaleyEngine.Database;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 namespace PaleyEngine;
 
@@ -174,14 +171,11 @@ internal class BitVector
     {
         Debug.Assert(_vector != null);
 
-        using (var stream = new FileStream(pathname, FileMode.Create, FileAccess.Write, FileShare.None))
-        {
-            using (var writer = new BinaryWriter(stream))
-            {
-                Debug.Assert(_vector.Length == _fileLength);
-                writer.Write(_vector);
-                writer.Flush();
-            }
-        }
+        using var stream = new FileStream(pathname, FileMode.Create, FileAccess.Write, FileShare.None);
+        using var writer = new BinaryWriter(stream);
+
+        Debug.Assert(_vector.Length == _fileLength);
+        writer.Write(_vector);
+        writer.Flush();
     }
 }
