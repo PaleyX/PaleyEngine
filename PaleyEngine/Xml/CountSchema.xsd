@@ -142,7 +142,7 @@
 					</xs:complexType>
 				</xs:element>
 				<!-- 
-          Splits - we can't limit sub type on the split type 
+          Splits - we can't limit subtype on the split type 
         -->
 				<xs:element name="splits" minOccurs="0" maxOccurs="1">
 					<xs:complexType>

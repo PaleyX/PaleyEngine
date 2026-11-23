@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Runtime.InteropServices;
 using System.Numerics;
-using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
@@ -23,7 +19,7 @@ internal static class BitVectorOperations
             count += BitOperations.PopCount(word);
         }
 
-        // any remaining bytes that don't fit into a ulong?
+        // any remaining bytes that don't fit into ulong?
         int remainderStart = words.Length * sizeof(ulong);
 
         for (int i = remainderStart; i < vector.Length; i++)

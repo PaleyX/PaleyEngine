@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Xml.Linq;
 
 namespace PaleyEngine.Database;
@@ -22,7 +19,7 @@ internal class PaleyDatabase
         LoadNewDatabase(path);
 
         // counts for properties display
-        AttributeCount = _attributes.Count();
+        AttributeCount = _attributes.Count;
         ValuesCount = _attributes.Sum(a => a.Value.Values.Count());
         InfoCount = _attributes.Sum(a => a.Value.Values.Sum(v => v.Tally));
     }
@@ -129,7 +126,7 @@ internal class PaleyDatabase
                 var attribute = _attributes.FirstOrDefault(a => a.Value.Id == value.attributeId);
                 if (attribute.Key == null || attribute.Value == null)
                 {
-                    throw new PaleyEngineException(string.Format("Cannot find AttributeId {0} loading values", value.attributeId));
+                    throw new PaleyEngineException($"Cannot find AttributeId {value.attributeId} loading values");
                 }
 
                 attribute.Value.AddValue(value.value);

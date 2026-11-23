@@ -1,10 +1,7 @@
 ﻿using PaleyEngine.Database;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
-using System.Xml;
 using System.Xml.Linq;
+using PaleyEngine.Translations;
 
 namespace PaleyEngine;
 
@@ -18,8 +15,9 @@ internal class Counter
     }
 
     internal long UniverseTally { get; set; }
+    internal long SelectionTally { get; set; }
 
-    internal void Count(XDocument document)
+    internal long Count(XDocument document)
     {
         if (_database is null)
         {
@@ -37,12 +35,12 @@ internal class Counter
         var selectionRoot = document.Root?.Element("selection");
         var splitsRoot = document.Root?.Element("splits");
 
-         var selectionTally = CountSelection(selectionRoot);
+        SelectionTally = CountSelection(selectionRoot);
 
-        Console.WriteLine($"Counting completed successfully. Selection tally: {selectionTally:N0}");
+        return SelectionTally;
     }
 
-    private long CountSelection(XElement selectionRoot)
+    private long CountSelection(XContainer selectionRoot)
     {
         var vectorStack = new VectorStack(_database);
 
@@ -64,6 +62,9 @@ internal class Counter
         Debug.Assert(vectorStack.Size == 1);
 
         //TODO: count level
+
+        //TODO: move this elsewhere - this is just for testing
+        DumpPerms(vectorStack);
 
         //TODO: not required if no selection logic or level
         return vectorStack.GetTopTally();
@@ -128,4 +129,129 @@ internal class Counter
             vectorStack.OrValue(value);
         }
     }
+
+    private void DumpPerms(VectorStack vectorStack, string? keycode = null, string keycode2 = null)
+    {
+        Debug.Assert(vectorStack.Size == 1);
+
+        // temp for now - will need a chosen path later
+        var path = Path.Combine(Path.GetDirectoryName(_database.DataFile), "PermDump.txt");
+
+        //TODO - write to CSV 
+
+        using var writer = new StreamWriter(path);
+        var vector = vectorStack.GetTopVector();
+
+        using TemporaryFile tempSource = new(),
+                            tempObject = new();
+
+        vector.DumpVector(tempSource.Pathname);
+
+        // Translate Temp 2 Perm
+        var length = new FileInfo(_database.PermTemp).Length;
+
+        //using (var translator = new UrnTranslator())
+        //{
+        //    translator.BinaryTempToPerm(tempSource.Pathname, tempObject.Pathname, _database.TempPerm, length);
+        //}
+        UrnTranslator.BinaryTempToPerm(tempSource.Pathname, tempObject.Pathname, _database.TempPerm, length);
+        //LegacyUrnTranslator.BinaryTempToPerm(tempSource.Pathname, tempObject.Pathname, _database.TempPerm, length);
+
+
+        var exported = CreateUrnsFromBitFile(writer, tempObject.Pathname, keycode, keycode2, vector.Tally());
+    }
+
+    private static int CreateUrnsFromBitFile(TextWriter writer, string dumpedPath, string keycode1, string keycode2, long expected)
+    {
+        //Debug.Assert(HasCount());
+        var currentTally = 0;
+
+        using var stream = new FileStream(dumpedPath, FileMode.Open, FileAccess.Read, FileShare.None);
+        using var reader = new BinaryReader(stream);
+
+        var hasKeycode1 = !string.IsNullOrWhiteSpace(keycode1);
+        var hasKeycode2 = !string.IsNullOrWhiteSpace(keycode2);
+
+        //OnUrnExportProgress.Raise(this, new ProgressEventArgs(0, 100));
+
+        int urn = 0;
+        //int oldPercent = 0;
+
+        const int TOREAD = 2048;
+
+        for (; ; )
+        {
+            byte[] buffer = reader.ReadBytes(TOREAD);
+
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                byte b = buffer[i];
+                int temp = 0;
+
+                while (b > 0)
+                {
+                    if ((b & 1) > 0)
+                    {
+                        long write = urn + temp;
+
+                        writer.Write(write.ToString());
+
+                        if (hasKeycode1)
+                        {
+                            writer.Write(keycode1);
+
+                            if (hasKeycode2)
+                            {
+                                writer.Write(keycode2);
+                            }
+                        }
+
+                        writer.WriteLine();
+                        ++currentTally;
+                    }
+
+                    b >>= 1;
+                    ++temp;
+                }
+
+                urn += 8;
+            }
+
+            // progress
+            //if (currentTally > 0)
+            //{
+            //    int percent = (int)(((double)currentTally / (double)expected) * 100d);
+            //    if (percent != oldPercent)
+            //    {
+            //        OnUrnExportProgress.Raise(this, new ProgressEventArgs(percent, 100));
+            //        oldPercent = percent;
+            //    }
+            //}
+
+            if (buffer.Length < TOREAD)
+                break;
+        }
+
+        if (currentTally != expected)
+        {
+            throw new PaleyEngineException($"WARNING - Export didn't export all URNs. Exported {currentTally:N0} from {expected:N0}");
+            //OnStatusText.Raise(this, new TextInfoEventArgs(string.Format("WARNING - Export didn't export all URNs. Exported {0:N0} from {1:N0}", currentTally, expected)));
+        }
+
+        //OnUrnExportProgress.Raise(this, new ProgressEventArgs(100, 100));
+
+        return currentTally;
+    }
+
+    ///// <summary>
+    ///// Is there a current count active
+    ///// </summary>
+    ///// <returns>true if a count is currently active</returns>
+    ////public bool HasCount()
+    //{
+    //    if (_VectorStack == null || _VectorStack.Size < 1)
+    //        return false;
+
+    //    return true;
+    //}
 }

@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="PaleyEngine/PaleyEngine.csproj" />
   <Project Path="PaleyEngineRepl/PaleyEngineRepl.csproj" />
+  <Project Path="Tests/Tests.csproj" Id="97dbc6cf-d903-4cec-88da-70dd279af2c6" />
 </Solution>

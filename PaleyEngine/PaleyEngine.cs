@@ -1,33 +1,33 @@
 ﻿using PaleyEngine.Database;
 using System.Xml.Linq;
 
-namespace PaleyEngine
+namespace PaleyEngine;
+
+public class PaleyEngine
 {
-    public class PaleyEngine()
+    private PaleyDatabase? _database;
+
+    public void OpenDatabase(string path)
     {
-        private PaleyDatabase? _database;
+        ArgumentNullException.ThrowIfNull(path);
 
-        public void OpenDatabase(string path)
+        if (!File.Exists(path))
         {
-            ArgumentNullException.ThrowIfNull(path);
-
-            if (!File.Exists(path))
-            {
-                throw new FileNotFoundException($"The database file '{path}' does not exist.");
-            }
-
-            _database = new PaleyDatabase(path);
+            throw new FileNotFoundException($"The database file '{path}' does not exist.");
         }
 
-        public void Count(XDocument document)
-        {
-            if (_database is null)
-            {
-                throw new PaleyEngineException("Database is not opened. Please call OpenDatabase() first.");
-            }
+        _database = new PaleyDatabase(path);
+    }
 
-            var counter = new Counter(_database);
-            counter.Count(document);
+    public long Count(XDocument document)
+    {
+        if (_database is null)
+        {
+            throw new PaleyEngineException("Database is not opened. Please call OpenDatabase() first.");
         }
+
+        var counter = new Counter(_database);
+            
+        return counter.Count(document);
     }
 }
